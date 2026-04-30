@@ -1,0 +1,35 @@
+<div class="table-shell">
+  <table class="products-table">
+    <thead>
+      <tr>
+        <th scope="col">Logo</th>
+        <th scope="col">Nombre del producto</th>
+        <th scope="col">Descripción</th>
+        <th scope="col">Fecha de liberación</th>
+        <th scope="col">Fecha de revisión</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (product of products; track trackById($index, product)) {
+        <tr>
+          <td>
+            <div class="logo-badge" aria-hidden="true">
+              <span>{{ getInitials(product.name) }}</span>
+              <img
+                [src]="product.logo"
+                [alt]="'Logo de ' + product.name"
+                loading="lazy"
+                (error)="hideBrokenImage($event)"
+              />
+            </div>
+          </td>
+          <td class="product-name">{{ product.name }}</td>
+          <td>{{ product.description }}</td>
+          <td>{{ formatDisplayDate(product.date_release) }}</td>
+          <td>{{ formatDisplayDate(product.date_revision) }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
