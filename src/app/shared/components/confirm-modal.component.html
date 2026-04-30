@@ -1,0 +1,37 @@
+<div class="modal-backdrop">
+  <section
+    class="modal-card"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="'confirm-modal-title'"
+  >
+    <header class="modal-header">
+      <h2 id="confirm-modal-title">{{ title }}</h2>
+    </header>
+
+    <div class="modal-body">
+      <p>
+        {{ message }}
+        @if (emphasisText) {
+          <strong>{{ emphasisText }}</strong
+          >?
+        }
+      </p>
+
+      @if (errorMessage) {
+        <div class="modal-error" aria-live="assertive">
+          {{ errorMessage }}
+        </div>
+      }
+    </div>
+
+    <footer class="modal-actions">
+      <button type="button" class="secondary-button" [disabled]="isLoading" (click)="handleCancel()">
+        {{ cancelLabel }}
+      </button>
+      <button type="button" class="danger-button" [disabled]="isLoading" (click)="handleConfirm()">
+        {{ isLoading ? 'Eliminando...' : confirmLabel }}
+      </button>
+    </footer>
+  </section>
+</div>

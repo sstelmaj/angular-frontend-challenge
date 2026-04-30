@@ -1,0 +1,49 @@
+<div class="table-shell">
+  <table class="products-table">
+    <thead>
+      <tr>
+        <th scope="col">Logo</th>
+        <th scope="col">Nombre del producto</th>
+        <th scope="col">Descripción</th>
+        <th scope="col">Fecha de liberación</th>
+        <th scope="col">Fecha de revisión</th>
+        <th scope="col" class="actions-column">Acciones</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (product of products; track trackById($index, product)) {
+        <tr>
+          <td>
+            <div class="logo-badge">
+              @if (shouldShowLogoImage(product)) {
+                <img
+                  [src]="product.logo"
+                  [alt]="'Logo de ' + product.name"
+                  loading="lazy"
+                  (error)="handleLogoError(product.id)"
+                />
+              } @else {
+                <span aria-hidden="true">{{ getInitials(product.name) }}</span>
+              }
+            </div>
+          </td>
+          <td class="product-name">{{ product.name }}</td>
+          <td>{{ product.description }}</td>
+          <td>{{ formatDisplayDate(product.date_release) }}</td>
+          <td>{{ formatDisplayDate(product.date_revision) }}</td>
+          <td class="actions-cell">
+            <app-product-actions-menu
+              [productName]="product.name"
+              [isOpen]="isMenuOpen(product.id)"
+              [dropdownStyle]="isMenuOpen(product.id) ? openMenuStyle() : null"
+              (toggleRequested)="toggleMenu(product.id, $event)"
+              (editSelected)="requestEdit(product.id)"
+              (deleteSelected)="requestDelete(product)"
+            ></app-product-actions-menu>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

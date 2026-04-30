@@ -1,0 +1,86 @@
+.table-shell {
+  overflow: visible;
+}
+
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.products-table th,
+.products-table td {
+  padding: 0.875rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.products-table th {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: #f4f7fb;
+}
+
+.products-table td {
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.product-name {
+  font-weight: 700;
+}
+
+.actions-column,
+.actions-cell {
+  width: 5.5rem;
+  text-align: right;
+}
+
+.actions-cell {
+  position: relative;
+}
+
+.logo-badge {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #dfe7f3;
+  color: var(--color-primary-strong);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.logo-badge img {
+  width: 100%;
+  height: 100%;
+  padding: 0.3rem;
+  object-fit: contain;
+  background: var(--color-surface);
+}
+
+.logo-badge span {
+  line-height: 1;
+}
+
+@media (max-width: 720px) {
+  .table-shell {
+    overflow-x: auto;
+    overflow-y: visible;
+  }
+
+  .products-table {
+    min-width: 860px;
+  }
+
+  .products-table th,
+  .products-table td {
+    padding: 0.75rem;
+  }
+}

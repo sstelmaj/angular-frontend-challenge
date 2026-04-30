@@ -1,0 +1,80 @@
+<section class="page-shell">
+  <app-brand-header></app-brand-header>
+
+  <header class="page-header">
+    <div class="page-header__content">
+      <h1>Productos financieros</h1>
+      <p class="supporting-text">Administrá el catálogo de productos registrados.</p>
+    </div>
+
+    <a class="primary-link" routerLink="/products/new">Agregar</a>
+  </header>
+
+  @if (feedbackMessage(); as message) {
+    <section class="feedback-banner" aria-live="polite">
+      <p>{{ message }}</p>
+      <button type="button" class="ghost-button" (click)="dismissFeedbackMessage()">
+        Cerrar
+      </button>
+    </section>
+  }
+
+  <section class="toolbar-card">
+    <app-products-search-box
+      [value]="searchTerm()"
+      (valueChange)="updateSearchTerm($event)"
+    ></app-products-search-box>
+  </section>
+
+  <section class="list-card">
+    @if (isLoading()) {
+      <div class="state-panel" aria-live="polite">
+        <h2>Cargando productos</h2>
+        <p>Obteniendo información desde el backend local.</p>
+      </div>
+    } @else if (errorMessage(); as message) {
+      <div class="state-panel state-panel--error" aria-live="assertive">
+        <h2>Error al cargar productos</h2>
+        <p>{{ message }}</p>
+        <button class="ghost-button" type="button" (click)="loadProducts()">Reintentar</button>
+      </div>
+    } @else if (visibleResultsCount() === 0) {
+      <div class="state-panel" aria-live="polite">
+        <h2>Sin resultados</h2>
+        @if (hasSearchTerm()) {
+          <p>No se encontraron productos para la búsqueda actual.</p>
+        } @else {
+          <p>No hay productos disponibles para mostrar.</p>
+        }
+      </div>
+    } @else {
+      <app-products-table
+        [products]="visibleProducts()"
+        (editRequested)="navigateToEdit($event)"
+        (deleteRequested)="openDeleteModal($event)"
+      ></app-products-table>
+    }
+
+    <footer class="list-footer">
+      <p class="results-counter">{{ resultSummary() }}</p>
+      <app-products-page-size-select
+        [value]="pageSize()"
+        [options]="pageSizeOptions"
+        (valueChange)="updatePageSize($event)"
+      ></app-products-page-size-select>
+    </footer>
+  </section>
+
+  @if (isDeleteModalOpen()) {
+    <app-confirm-modal
+      title="Eliminar producto"
+      [message]="deleteModalMessage()"
+      [emphasisText]="deleteModalEmphasisText()"
+      confirmLabel="Eliminar"
+      [isLoading]="isDeleting()"
+      [errorMessage]="deleteErrorMessage()"
+      (cancel)="closeDeleteModal()"
+      (confirm)="confirmDeleteProduct()"
+    ></app-confirm-modal>
+  }
+</section>

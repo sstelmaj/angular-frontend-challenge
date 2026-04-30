@@ -1,0 +1,56 @@
+:root {
+  --color-background: #f3f5f8;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f3f6fa;
+  --color-border: #d8e0ea;
+  --color-border-strong: #c6d1df;
+  --color-text: #172231;
+  --color-text-muted: #66758b;
+  --color-primary: #184179;
+  --color-primary-strong: #0f2c57;
+  --color-primary-soft: #e8eef7;
+  --color-error: #b44a4a;
+  --color-error-soft: rgba(180, 74, 74, 0.08);
+  --shadow-soft: 0 10px 24px rgba(15, 32, 57, 0.06);
+  --shadow-modal: 0 20px 48px rgba(15, 32, 57, 0.16);
+  --radius-md: 14px;
+  --radius-sm: 8px;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.5;
+  color: var(--color-text);
+  background:
+    linear-gradient(180deg, rgba(24, 65, 121, 0.04) 0%, transparent 18%),
+    linear-gradient(180deg, #f8fafc 0%, var(--color-background) 100%);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}

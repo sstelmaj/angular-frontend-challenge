@@ -1,0 +1,10 @@
+<label class="search-box">
+  <span class="search-box__label">Buscar productos</span>
+  <input
+    class="search-box__input"
+    type="search"
+    [value]="value"
+    placeholder="Buscar por ID, nombre o descripción"
+    (input)="onInput($event)"
+  />
+</label>
