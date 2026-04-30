@@ -1,0 +1,15 @@
+<section class="page-shell">
+  <a class="back-link" routerLink="/products">Volver a productos</a>
+
+  <div class="placeholder-card">
+    <p class="eyebrow">Phase 1</p>
+    <h1>{{ mode === 'edit' ? 'Edición de producto' : 'Alta de producto' }}</h1>
+    <p class="supporting-text">
+      La ruta base ya está disponible. El formulario real se implementará en la fase de creación.
+    </p>
+
+    @if (productId) {
+      <p class="route-meta">Producto seleccionado: <strong>{{ productId }}</strong></p>
+    }
+  </div>
+</section>
