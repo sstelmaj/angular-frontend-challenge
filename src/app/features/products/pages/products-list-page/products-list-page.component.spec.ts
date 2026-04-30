@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
-import { of, Subject, throwError } from 'rxjs';
+import { NEVER, of, Subject, throwError } from 'rxjs';
 
 import { Product } from '../../models/product.model';
 import { ProductApiService } from '../../services/product-api.service';
@@ -12,6 +12,7 @@ describe('ProductsListPageComponent', () => {
   let component: ProductsListPageComponent;
   let router: Router;
   let productApiServiceSpy: {
+    deleteProduct: jest.Mock;
     getProducts: jest.Mock;
   };
 
@@ -36,6 +37,7 @@ describe('ProductsListPageComponent', () => {
 
   beforeEach(async () => {
     productApiServiceSpy = {
+      deleteProduct: jest.fn(),
       getProducts: jest.fn()
     };
 
@@ -142,6 +144,88 @@ describe('ProductsListPageComponent', () => {
     component['navigateToEdit']('trj-crd');
 
     expect(navigateSpy).toHaveBeenCalledWith(['/products', 'trj-crd', 'edit']);
+  });
+
+  it('should open and close the delete modal', () => {
+    productApiServiceSpy.getProducts.mockReturnValue(of({ data: products }));
+
+    fixture = TestBed.createComponent(ProductsListPageComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    component['openDeleteModal'](products[0]);
+    fixture.detectChanges();
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain(
+      '¿Está seguro de eliminar el producto Tarjetas de Credito?'
+    );
+
+    component['closeDeleteModal']();
+    fixture.detectChanges();
+    expect((fixture.nativeElement as HTMLElement).textContent).not.toContain(
+      '¿Está seguro de eliminar el producto Tarjetas de Credito?'
+    );
+  });
+
+  it('should call deleteProduct and remove the product from the local list on success', () => {
+    productApiServiceSpy.getProducts.mockReturnValue(of({ data: products }));
+    productApiServiceSpy.deleteProduct.mockReturnValue(of({ message: 'Product removed successfully' }));
+
+    fixture = TestBed.createComponent(ProductsListPageComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    component['openDeleteModal'](products[0]);
+    component['confirmDeleteProduct']();
+    fixture.detectChanges();
+
+    expect(productApiServiceSpy.deleteProduct).toHaveBeenCalledWith('trj-crd');
+    expect(component['products']()).toEqual([products[1]]);
+    expect(component['resultSummary']()).toBe('1 de 1 resultados');
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain(
+      'Producto eliminado correctamente.'
+    );
+  });
+
+  it('should keep the modal open and show an error when delete fails', () => {
+    productApiServiceSpy.getProducts.mockReturnValue(of({ data: products }));
+    productApiServiceSpy.deleteProduct.mockReturnValue(
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 404,
+            statusText: 'Not Found'
+          })
+      )
+    );
+
+    fixture = TestBed.createComponent(ProductsListPageComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    component['openDeleteModal'](products[0]);
+    component['confirmDeleteProduct']();
+    fixture.detectChanges();
+
+    expect(component['productPendingDeletion']()).toEqual(products[0]);
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain(
+      'No se encontro un producto con el identificador indicado.'
+    );
+  });
+
+  it('should avoid double confirmation while deleting', () => {
+    productApiServiceSpy.getProducts.mockReturnValue(of({ data: products }));
+    productApiServiceSpy.deleteProduct.mockReturnValue(NEVER);
+
+    fixture = TestBed.createComponent(ProductsListPageComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    component['openDeleteModal'](products[0]);
+    component['confirmDeleteProduct']();
+    component['confirmDeleteProduct']();
+
+    expect(productApiServiceSpy.deleteProduct).toHaveBeenCalledTimes(1);
+    expect(component['isDeleting']()).toBe(true);
   });
 
   it('should show the error state when loading products fails', () => {

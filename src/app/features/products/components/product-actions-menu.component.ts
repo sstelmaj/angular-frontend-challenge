@@ -9,6 +9,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal
 export class ProductActionsMenuComponent {
   @Input() productName = 'producto';
   @Output() readonly editSelected = new EventEmitter<void>();
+  @Output() readonly deleteSelected = new EventEmitter<void>();
 
   protected readonly isOpen = signal(false);
 
@@ -18,6 +19,11 @@ export class ProductActionsMenuComponent {
 
   protected handleEdit(): void {
     this.editSelected.emit();
+    this.isOpen.set(false);
+  }
+
+  protected handleDelete(): void {
+    this.deleteSelected.emit();
     this.isOpen.set(false);
   }
 }

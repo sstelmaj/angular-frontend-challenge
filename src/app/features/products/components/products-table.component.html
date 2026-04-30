@@ -33,6 +33,7 @@
             <app-product-actions-menu
               [productName]="product.name"
               (editSelected)="requestEdit(product.id)"
+              (deleteSelected)="requestDelete(product)"
             ></app-product-actions-menu>
           </td>
         </tr>

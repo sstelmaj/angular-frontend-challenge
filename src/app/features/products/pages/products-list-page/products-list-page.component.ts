@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, injec
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 
+import { ConfirmModalComponent } from '../../../../shared/components/confirm-modal.component';
 import { getHttpErrorMessage } from '../../../../shared/utils/http-error.utils';
 import { ProductsPageSizeSelectComponent } from '../../components/products-page-size-select.component';
 import { ProductsSearchBoxComponent } from '../../components/products-search-box.component';
@@ -20,6 +21,7 @@ import {
   selector: 'app-products-list-page',
   imports: [
     RouterLink,
+    ConfirmModalComponent,
     ProductsSearchBoxComponent,
     ProductsPageSizeSelectComponent,
     ProductsTableComponent
@@ -40,6 +42,9 @@ export class ProductsListPageComponent implements OnInit {
   protected readonly isLoading = signal(true);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly feedbackMessage = signal<string | null>(null);
+  protected readonly productPendingDeletion = signal<Product | null>(null);
+  protected readonly deleteErrorMessage = signal<string | null>(null);
+  protected readonly isDeleting = signal(false);
 
   protected readonly filteredProducts = computed(() =>
     filterProducts(this.products(), this.searchTerm())
@@ -55,6 +60,11 @@ export class ProductsListPageComponent implements OnInit {
   protected readonly hasSearchTerm = computed(
     () => normalizeSearchTerm(this.searchTerm()).length > 0
   );
+  protected readonly isDeleteModalOpen = computed(() => this.productPendingDeletion() !== null);
+  protected readonly deleteModalMessage = computed(() => {
+    const product = this.productPendingDeletion();
+    return product ? `¿Está seguro de eliminar el producto ${product.name}?` : '';
+  });
 
   ngOnInit(): void {
     this.feedbackMessage.set(this.getFeedbackMessage());
@@ -71,6 +81,48 @@ export class ProductsListPageComponent implements OnInit {
 
   protected navigateToEdit(productId: string): void {
     void this.router.navigate(['/products', productId, 'edit']);
+  }
+
+  protected openDeleteModal(product: Product): void {
+    this.productPendingDeletion.set(product);
+    this.deleteErrorMessage.set(null);
+  }
+
+  protected closeDeleteModal(): void {
+    if (this.isDeleting()) {
+      return;
+    }
+
+    this.productPendingDeletion.set(null);
+    this.deleteErrorMessage.set(null);
+  }
+
+  protected confirmDeleteProduct(): void {
+    const product = this.productPendingDeletion();
+
+    if (!product || this.isDeleting()) {
+      return;
+    }
+
+    this.isDeleting.set(true);
+    this.deleteErrorMessage.set(null);
+
+    this.productApiService
+      .deleteProduct(product.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.products.update((products) => products.filter((current) => current.id !== product.id));
+          this.productPendingDeletion.set(null);
+          this.deleteErrorMessage.set(null);
+          this.isDeleting.set(false);
+          this.feedbackMessage.set('Producto eliminado correctamente.');
+        },
+        error: (error: unknown) => {
+          this.deleteErrorMessage.set(getHttpErrorMessage(error, 'deleteProduct'));
+          this.isDeleting.set(false);
+        }
+      });
   }
 
   protected loadProducts(): void {

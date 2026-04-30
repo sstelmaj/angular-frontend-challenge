@@ -50,3 +50,7 @@
 .actions-menu__item:hover {
   background: var(--color-surface-muted);
 }
+
+.actions-menu__item--danger {
+  color: var(--color-error);
+}
