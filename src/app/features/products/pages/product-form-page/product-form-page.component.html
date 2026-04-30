@@ -1,15 +1,30 @@
 <section class="page-shell">
   <a class="back-link" routerLink="/products">Volver a productos</a>
 
-  <div class="placeholder-card">
-    <p class="eyebrow">Phase 1</p>
-    <h1>{{ mode === 'edit' ? 'Edición de producto' : 'Alta de producto' }}</h1>
-    <p class="supporting-text">
-      La ruta base ya está disponible. El formulario real se implementará en la fase de creación.
-    </p>
+  @if (mode() === 'create') {
+    <div class="form-card">
+      <p class="eyebrow">Alta de producto</p>
+      <h1>Formulario de Registro</h1>
+      <p class="supporting-text">
+        Completá los datos requeridos para registrar un nuevo producto financiero.
+      </p>
 
-    @if (productId) {
+      <app-product-form
+        [mode]="mode()"
+        [submitting]="isSubmitting()"
+        [submitError]="submitError()"
+        (submitted)="handleCreateProduct($event)"
+        (resetRequested)="clearSubmitError()"
+      ></app-product-form>
+    </div>
+  } @else {
+    <div class="placeholder-card">
+      <p class="eyebrow">Próximamente</p>
+      <h1>Edición de producto</h1>
+      <p class="supporting-text">
+        La reutilización del formulario para edición queda preparada, pero esta fase solo cubre el alta.
+      </p>
       <p class="route-meta">Producto seleccionado: <strong>{{ productId }}</strong></p>
-    }
-  </div>
+    </div>
+  }
 </section>

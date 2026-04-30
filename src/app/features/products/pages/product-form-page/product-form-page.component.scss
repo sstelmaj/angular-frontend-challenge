@@ -1,5 +1,5 @@
 .page-shell {
-  max-width: 960px;
+  max-width: 920px;
   margin: 0 auto;
   padding: var(--space-6);
 }
@@ -11,12 +11,13 @@
   text-decoration: none;
 }
 
+.form-card,
 .placeholder-card {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
   box-shadow: var(--shadow-soft);
-  padding: var(--space-5);
+  padding: var(--space-6);
 }
 
 .eyebrow {
@@ -46,5 +47,10 @@ h1 {
 @media (max-width: 720px) {
   .page-shell {
     padding: var(--space-5) var(--space-4);
+  }
+
+  .form-card,
+  .placeholder-card {
+    padding: var(--space-5);
   }
 }
