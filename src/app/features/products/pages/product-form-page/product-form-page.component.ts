@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signa
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
+import { getHttpErrorMessage } from '../../../../shared/utils/http-error.utils';
 import { ProductFormComponent } from '../../components/product-form.component';
 import { CreateProductPayload } from '../../models/product.payloads';
 import { ProductApiService } from '../../services/product-api.service';
@@ -27,7 +28,7 @@ export class ProductFormPageComponent {
   protected readonly submitError = signal<string | null>(null);
 
   protected handleCreateProduct(payload: CreateProductPayload): void {
-    if (this.mode() !== 'create') {
+    if (this.mode() !== 'create' || this.isSubmitting()) {
       return;
     }
 
@@ -43,9 +44,9 @@ export class ProductFormPageComponent {
             state: { feedbackMessage: 'Producto agregado correctamente.' }
           });
         },
-        error: () => {
+        error: (error: unknown) => {
           this.isSubmitting.set(false);
-          this.submitError.set('No fue posible crear el producto. Intentá nuevamente.');
+          this.submitError.set(getHttpErrorMessage(error, 'createProduct'));
         }
       });
   }

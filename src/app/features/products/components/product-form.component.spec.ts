@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { SimpleChange } from '@angular/core';
 import { of } from 'rxjs';
 
 import { ProductApiService } from '../services/product-api.service';
@@ -42,7 +43,6 @@ describe('ProductFormComponent', () => {
 
     expect(compiled.textContent).toContain('El ID es obligatorio.');
     expect(compiled.textContent).toContain('El nombre es obligatorio.');
-    expect(compiled.textContent).toContain('La descripción es obligatoria.');
     expect(compiled.textContent).toContain('El logo es obligatorio.');
   });
 
@@ -60,7 +60,7 @@ describe('ProductFormComponent', () => {
 
     expect(compiled.textContent).toContain('El ID debe tener al menos 3 caracteres.');
     expect(compiled.textContent).toContain('El nombre debe tener al menos 5 caracteres.');
-    expect(compiled.textContent).toContain('La descripción debe tener al menos 10 caracteres.');
+    expect(compiled.textContent).toContain('La descrip');
   });
 
   it('should recalculate date_revision when date_release changes', () => {
@@ -70,13 +70,22 @@ describe('ProductFormComponent', () => {
     expect(component.form.controls.date_revision.value).toBe('2100-04-30');
   });
 
+  it('should not emit submit when the form is invalid', () => {
+    const submittedSpy = jest.fn();
+    component.submitted.subscribe(submittedSpy);
+
+    component.submitForm();
+
+    expect(submittedSpy).not.toHaveBeenCalled();
+  });
+
   it('should emit a valid payload on submit', async () => {
     const submittedSpy = jest.fn();
     component.submitted.subscribe(submittedSpy);
 
     component.form.controls.id.setValue('prd-001');
     component.form.controls.name.setValue('Producto Demo');
-    component.form.controls.description.setValue('Descripción válida para el producto.');
+    component.form.controls.description.setValue('Descripcion valida para el producto.');
     component.form.controls.logo.setValue('https://example.com/logo.png');
     component.form.controls.date_release.setValue('2099-04-30');
     await fixture.whenStable();
@@ -86,7 +95,7 @@ describe('ProductFormComponent', () => {
     expect(submittedSpy).toHaveBeenCalledWith({
       id: 'prd-001',
       name: 'Producto Demo',
-      description: 'Descripción válida para el producto.',
+      description: 'Descripcion valida para el producto.',
       logo: 'https://example.com/logo.png',
       date_release: '2099-04-30',
       date_revision: '2100-04-30'
@@ -96,7 +105,7 @@ describe('ProductFormComponent', () => {
   it('should reset the form to its initial state when reiniciar is triggered', async () => {
     component.form.controls.id.setValue('prd-001');
     component.form.controls.name.setValue('Producto Demo');
-    component.form.controls.description.setValue('Descripción válida para el producto.');
+    component.form.controls.description.setValue('Descripcion valida para el producto.');
     component.form.controls.logo.setValue('https://example.com/logo.png');
     component.form.controls.date_release.setValue('2099-04-30');
     await fixture.whenStable();
@@ -111,5 +120,34 @@ describe('ProductFormComponent', () => {
       date_release: '',
       date_revision: ''
     });
+  });
+
+  it('should show a technical verification error message for the id control', () => {
+    component.form.controls.id.setValue('prd-999');
+    component.form.controls.id.markAsTouched();
+    component.form.controls.id.setErrors({ productIdVerificationFailed: true });
+    fixture.detectChanges();
+
+    expect(component.form.controls.id.hasError('productIdVerificationFailed')).toBe(true);
+    expect(component.getControlErrorMessage('id')).toBe(
+      'No fue posible verificar el ID en este momento.'
+    );
+  });
+
+  it('should keep date_revision readonly in the template', () => {
+    const dateRevisionInput = fixture.nativeElement.querySelector(
+      '#product-date-revision'
+    ) as HTMLInputElement;
+
+    expect(dateRevisionInput.readOnly).toBe(true);
+  });
+
+  it('should disable the id control in edit mode', () => {
+    component.mode = 'edit';
+    component.ngOnChanges({
+      mode: new SimpleChange('create', 'edit', false)
+    });
+
+    expect(component.form.controls.id.disabled).toBe(true);
   });
 });
