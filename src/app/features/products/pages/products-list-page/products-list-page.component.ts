@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { ProductsPageSizeSelectComponent } from '../../components/products-page-size-select.component';
 import { ProductsSearchBoxComponent } from '../../components/products-search-box.component';
@@ -29,6 +29,7 @@ import {
 })
 export class ProductsListPageComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
   private readonly productApiService = inject(ProductApiService);
 
   protected readonly pageSizeOptions = PAGE_SIZE_OPTIONS;
@@ -37,6 +38,7 @@ export class ProductsListPageComponent implements OnInit {
   protected readonly pageSize = signal<PageSizeOption>(5);
   protected readonly isLoading = signal(true);
   protected readonly errorMessage = signal<string | null>(null);
+  protected readonly feedbackMessage = signal<string | null>(null);
 
   protected readonly filteredProducts = computed(() =>
     filterProducts(this.products(), this.searchTerm())
@@ -54,6 +56,7 @@ export class ProductsListPageComponent implements OnInit {
   );
 
   ngOnInit(): void {
+    this.feedbackMessage.set(this.getFeedbackMessage());
     this.loadProducts();
   }
 
@@ -85,5 +88,19 @@ export class ProductsListPageComponent implements OnInit {
           this.isLoading.set(false);
         }
       });
+  }
+
+  protected dismissFeedbackMessage(): void {
+    this.feedbackMessage.set(null);
+  }
+
+  private getFeedbackMessage(): string | null {
+    const currentNavigationMessage = this.router.getCurrentNavigation()?.extras.state?.[
+      'feedbackMessage'
+    ];
+    const historyStateMessage = history.state?.['feedbackMessage'];
+    const feedbackMessage = currentNavigationMessage ?? historyStateMessage;
+
+    return typeof feedbackMessage === 'string' ? feedbackMessage : null;
   }
 }

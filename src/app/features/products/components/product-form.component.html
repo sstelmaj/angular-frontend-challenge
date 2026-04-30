@@ -1,0 +1,117 @@
+<form class="product-form" [formGroup]="form" (ngSubmit)="submitForm()" novalidate>
+  @if (submitError) {
+    <div class="form-alert" aria-live="assertive">
+      {{ submitError }}
+    </div>
+  }
+
+  <div class="form-grid">
+    <div class="field">
+      <label class="field__label" for="product-id">ID</label>
+      <input
+        id="product-id"
+        class="field__control"
+        [class.field__control--error]="hasControlError('id')"
+        type="text"
+        formControlName="id"
+        maxlength="10"
+        autocomplete="off"
+      />
+      @if (getControlErrorMessage('id'); as message) {
+        <p class="field__error">{{ message }}</p>
+      }
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="product-name">Nombre</label>
+      <input
+        id="product-name"
+        class="field__control"
+        [class.field__control--error]="hasControlError('name')"
+        type="text"
+        formControlName="name"
+        maxlength="100"
+        autocomplete="off"
+      />
+      @if (getControlErrorMessage('name'); as message) {
+        <p class="field__error">{{ message }}</p>
+      }
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="product-description">Descripción</label>
+      <textarea
+        id="product-description"
+        class="field__control field__control--textarea"
+        [class.field__control--error]="hasControlError('description')"
+        formControlName="description"
+        maxlength="200"
+        rows="4"
+      ></textarea>
+      @if (getControlErrorMessage('description'); as message) {
+        <p class="field__error">{{ message }}</p>
+      }
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="product-logo">Logo</label>
+      <input
+        id="product-logo"
+        class="field__control"
+        [class.field__control--error]="hasControlError('logo')"
+        type="url"
+        formControlName="logo"
+        autocomplete="off"
+      />
+      @if (getControlErrorMessage('logo'); as message) {
+        <p class="field__error">{{ message }}</p>
+      }
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="product-date-release">Fecha de liberación</label>
+      <input
+        id="product-date-release"
+        class="field__control"
+        [class.field__control--error]="hasControlError('date_release')"
+        type="date"
+        formControlName="date_release"
+      />
+      @if (getControlErrorMessage('date_release'); as message) {
+        <p class="field__error">{{ message }}</p>
+      }
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="product-date-revision">Fecha de revisión</label>
+      <input
+        id="product-date-revision"
+        class="field__control field__control--readonly"
+        [class.field__control--error]="hasControlError('date_revision') || hasDateRevisionMismatch()"
+        type="date"
+        formControlName="date_revision"
+        readonly
+      />
+      @if (getControlErrorMessage('date_revision'); as message) {
+        <p class="field__error">{{ message }}</p>
+      } @else if (hasDateRevisionMismatch()) {
+        <p class="field__error">
+          La Fecha de revisión debe ser exactamente un año posterior a la fecha de liberación.
+        </p>
+      }
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button class="secondary-button" type="button" [disabled]="submitting" (click)="resetForm()">
+      Reiniciar
+    </button>
+    <button
+      class="primary-button"
+      type="submit"
+      [disabled]="submitting || form.invalid || form.pending"
+    >
+      {{ submitting ? 'Agregando...' : 'Agregar' }}
+    </button>
+  </div>
+</form>

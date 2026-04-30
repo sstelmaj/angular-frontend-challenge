@@ -11,6 +11,15 @@
     <a class="primary-link" routerLink="/products/new">Agregar</a>
   </header>
 
+  @if (feedbackMessage(); as message) {
+    <section class="feedback-banner" aria-live="polite">
+      <p>{{ message }}</p>
+      <button type="button" class="ghost-button" (click)="dismissFeedbackMessage()">
+        Cerrar
+      </button>
+    </section>
+  }
+
   <section class="toolbar-card">
     <app-products-search-box
       [value]="searchTerm()"
