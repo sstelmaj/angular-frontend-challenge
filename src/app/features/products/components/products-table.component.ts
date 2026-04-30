@@ -13,6 +13,7 @@ import { ProductActionsMenuComponent } from './product-actions-menu.component';
 export class ProductsTableComponent {
   @Input({ required: true }) products: readonly Product[] = [];
   @Output() readonly editRequested = new EventEmitter<string>();
+  @Output() readonly deleteRequested = new EventEmitter<Product>();
 
   protected trackById(index: number, product: Product): string {
     return product.id;
@@ -44,5 +45,9 @@ export class ProductsTableComponent {
 
   protected requestEdit(productId: string): void {
     this.editRequested.emit(productId);
+  }
+
+  protected requestDelete(product: Product): void {
+    this.deleteRequested.emit(product);
   }
 }

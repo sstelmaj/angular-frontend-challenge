@@ -29,6 +29,7 @@ describe('ProductActionsMenuComponent', () => {
     trigger.click();
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('Editar');
+    expect(fixture.nativeElement.textContent).toContain('Eliminar');
 
     trigger.click();
     fixture.detectChanges();
@@ -48,5 +49,23 @@ describe('ProductActionsMenuComponent', () => {
 
     expect(emitSpy).toHaveBeenCalled();
     expect(fixture.nativeElement.textContent).not.toContain('Editar');
+  });
+
+  it('should emit delete and mark the action as destructive', () => {
+    const emitSpy = jest.spyOn(component.deleteSelected, 'emit');
+    const trigger = fixture.nativeElement.querySelector('button') as HTMLButtonElement;
+
+    trigger.click();
+    fixture.detectChanges();
+
+    const deleteButton = fixture.nativeElement.querySelector(
+      '.actions-menu__item--danger'
+    ) as HTMLButtonElement;
+    expect(deleteButton.textContent).toContain('Eliminar');
+
+    deleteButton.click();
+    fixture.detectChanges();
+
+    expect(emitSpy).toHaveBeenCalled();
   });
 });

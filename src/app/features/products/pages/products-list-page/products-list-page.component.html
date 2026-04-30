@@ -52,6 +52,7 @@
       <app-products-table
         [products]="visibleProducts()"
         (editRequested)="navigateToEdit($event)"
+        (deleteRequested)="openDeleteModal($event)"
       ></app-products-table>
     }
 
@@ -64,4 +65,16 @@
       ></app-products-page-size-select>
     </footer>
   </section>
+
+  @if (isDeleteModalOpen()) {
+    <app-confirm-modal
+      title="Eliminar producto"
+      [message]="deleteModalMessage()"
+      confirmLabel="Eliminar"
+      [isLoading]="isDeleting()"
+      [errorMessage]="deleteErrorMessage()"
+      (cancel)="closeDeleteModal()"
+      (confirm)="confirmDeleteProduct()"
+    ></app-confirm-modal>
+  }
 </section>

@@ -155,4 +155,26 @@ describe('ProductApiService', () => {
     expect(actualError).toBeInstanceOf(HttpErrorResponse);
     expect(actualError?.status).toBe(500);
   });
+
+  it('should propagate delete errors from the backend', () => {
+    let actualError: HttpErrorResponse | undefined;
+
+    service.deleteProduct('prd-404').subscribe({
+      next: () => {
+        throw new Error('Expected an error response');
+      },
+      error: (error) => {
+        actualError = error;
+      }
+    });
+
+    const request = httpTestingController.expectOne(PRODUCTS_API_ENDPOINTS.byId('prd-404'));
+    request.flush(
+      { message: 'not found' },
+      { status: 404, statusText: 'Not Found' }
+    );
+
+    expect(actualError).toBeInstanceOf(HttpErrorResponse);
+    expect(actualError?.status).toBe(404);
+  });
 });

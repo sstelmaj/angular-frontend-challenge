@@ -71,4 +71,22 @@ describe('ProductsTableComponent', () => {
 
     expect(emitSpy).toHaveBeenCalledWith('trj-crd');
   });
+
+  it('should emit deleteRequested when selecting Eliminar for a product', () => {
+    const emitSpy = jest.spyOn(component.deleteRequested, 'emit');
+    const actionButtons = fixture.nativeElement.querySelectorAll(
+      '.actions-menu__trigger'
+    ) as NodeListOf<HTMLButtonElement>;
+
+    actionButtons[0].click();
+    fixture.detectChanges();
+
+    const deleteButton = fixture.nativeElement.querySelector(
+      '.actions-menu__item--danger'
+    ) as HTMLButtonElement;
+    deleteButton.click();
+    fixture.detectChanges();
+
+    expect(emitSpy).toHaveBeenCalledWith(products[0]);
+  });
 });
