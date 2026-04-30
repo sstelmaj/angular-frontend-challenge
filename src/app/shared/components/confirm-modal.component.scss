@@ -4,23 +4,23 @@
   display: grid;
   place-items: center;
   padding: var(--space-4);
-  background: rgba(10, 18, 32, 0.45);
+  background: rgba(10, 18, 32, 0.38);
   z-index: 20;
 }
 
 .modal-card {
-  width: min(100%, 30rem);
+  width: min(100%, 29rem);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
-  box-shadow: var(--shadow-soft);
+  box-shadow: var(--shadow-modal);
   overflow: hidden;
 }
 
 .modal-header,
 .modal-body,
 .modal-actions {
-  padding: var(--space-5);
+  padding: 1.25rem 1.5rem;
 }
 
 .modal-header {
@@ -29,22 +29,29 @@
 
 .modal-header h2 {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.125rem;
+  line-height: 1.3;
 }
 
 .modal-body p {
   margin: 0;
   color: var(--color-text);
-  line-height: 1.5;
+  line-height: 1.55;
+}
+
+.modal-body strong {
+  color: var(--color-primary-strong);
+  font-weight: 700;
 }
 
 .modal-error {
-  margin-top: var(--space-4);
+  margin-top: var(--space-3);
   padding: var(--space-3) var(--space-4);
-  border: 1px solid rgba(199, 52, 52, 0.25);
+  border: 1px solid rgba(180, 74, 74, 0.22);
   border-radius: var(--radius-sm);
-  background: rgba(199, 52, 52, 0.08);
+  background: var(--color-error-soft);
   color: var(--color-error);
+  font-size: 0.875rem;
   font-weight: 600;
 }
 
@@ -58,22 +65,33 @@
 .secondary-button,
 .danger-button {
   min-width: 8rem;
-  min-height: 3rem;
+  min-height: 2.75rem;
   padding: 0 var(--space-4);
-  border: 0;
+  border: 1px solid transparent;
   border-radius: var(--radius-sm);
   font-weight: 700;
   cursor: pointer;
 }
 
 .secondary-button {
-  background: var(--color-surface-muted);
+  border-color: var(--color-border-strong);
+  background: var(--color-surface);
   color: var(--color-primary-strong);
 }
 
 .danger-button {
-  background: #c73434;
+  background: #b54a4a;
   color: #fff;
+}
+
+.secondary-button:hover:not(:disabled),
+.secondary-button:focus:not(:disabled) {
+  background: var(--color-primary-soft);
+}
+
+.danger-button:hover:not(:disabled),
+.danger-button:focus:not(:disabled) {
+  background: #9f3f3f;
 }
 
 .secondary-button:focus,

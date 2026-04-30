@@ -83,6 +83,18 @@ describe('ProductsListPageComponent', () => {
     expect(compiled.textContent).toContain('Tarjetas de Credito');
   });
 
+  it('should render the brand header on the products list page', () => {
+    productApiServiceSpy.getProducts.mockReturnValue(of({ data: products }));
+
+    fixture = TestBed.createComponent(ProductsListPageComponent);
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    expect(compiled.textContent).toContain('BANCO');
+    expect(compiled.querySelector('app-brand-header')).not.toBeNull();
+  });
+
   it('should render an empty state when the list is empty', () => {
     productApiServiceSpy.getProducts.mockReturnValue(of({ data: [] }));
 
@@ -146,6 +158,28 @@ describe('ProductsListPageComponent', () => {
     expect(navigateSpy).toHaveBeenCalledWith(['/products', 'trj-crd', 'edit']);
   });
 
+  it('should close the dropdown and navigate when selecting Editar from the table', () => {
+    const navigateSpy = jest.spyOn(router, 'navigate').mockResolvedValue(true);
+    productApiServiceSpy.getProducts.mockReturnValue(of({ data: products }));
+
+    fixture = TestBed.createComponent(ProductsListPageComponent);
+    fixture.detectChanges();
+
+    const actionButtons = fixture.nativeElement.querySelectorAll(
+      '.actions-menu__trigger'
+    ) as NodeListOf<HTMLButtonElement>;
+
+    actionButtons[0].click();
+    fixture.detectChanges();
+
+    const editButton = fixture.nativeElement.querySelector('.actions-menu__item') as HTMLButtonElement;
+    editButton.click();
+    fixture.detectChanges();
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/products', 'trj-crd', 'edit']);
+    expect(fixture.nativeElement.querySelectorAll('.actions-menu__dropdown')).toHaveLength(0);
+  });
+
   it('should open and close the delete modal', () => {
     productApiServiceSpy.getProducts.mockReturnValue(of({ data: products }));
 
@@ -162,6 +196,31 @@ describe('ProductsListPageComponent', () => {
     component['closeDeleteModal']();
     fixture.detectChanges();
     expect((fixture.nativeElement as HTMLElement).textContent).not.toContain(
+      '¿Está seguro de eliminar el producto Tarjetas de Credito?'
+    );
+  });
+
+  it('should close the dropdown and open the delete modal when selecting Eliminar from the table', () => {
+    productApiServiceSpy.getProducts.mockReturnValue(of({ data: products }));
+
+    fixture = TestBed.createComponent(ProductsListPageComponent);
+    fixture.detectChanges();
+
+    const actionButtons = fixture.nativeElement.querySelectorAll(
+      '.actions-menu__trigger'
+    ) as NodeListOf<HTMLButtonElement>;
+
+    actionButtons[0].click();
+    fixture.detectChanges();
+
+    const deleteButton = fixture.nativeElement.querySelector(
+      '.actions-menu__item--danger'
+    ) as HTMLButtonElement;
+    deleteButton.click();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelectorAll('.actions-menu__dropdown')).toHaveLength(0);
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain(
       '¿Está seguro de eliminar el producto Tarjetas de Credito?'
     );
   });

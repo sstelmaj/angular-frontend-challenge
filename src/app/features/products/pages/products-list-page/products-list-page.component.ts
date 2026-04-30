@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, injec
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 
+import { AppBrandHeaderComponent } from '../../../../shared/components/app-brand-header.component';
 import { ConfirmModalComponent } from '../../../../shared/components/confirm-modal.component';
 import { getHttpErrorMessage } from '../../../../shared/utils/http-error.utils';
 import { ProductsPageSizeSelectComponent } from '../../components/products-page-size-select.component';
@@ -20,6 +21,7 @@ import {
 @Component({
   selector: 'app-products-list-page',
   imports: [
+    AppBrandHeaderComponent,
     RouterLink,
     ConfirmModalComponent,
     ProductsSearchBoxComponent,
@@ -63,8 +65,11 @@ export class ProductsListPageComponent implements OnInit {
   protected readonly isDeleteModalOpen = computed(() => this.productPendingDeletion() !== null);
   protected readonly deleteModalMessage = computed(() => {
     const product = this.productPendingDeletion();
-    return product ? `¿Está seguro de eliminar el producto ${product.name}?` : '';
+    return product ? '¿Está seguro de eliminar el producto' : '';
   });
+  protected readonly deleteModalEmphasisText = computed(
+    () => this.productPendingDeletion()?.name ?? ''
+  );
 
   ngOnInit(): void {
     this.feedbackMessage.set(this.getFeedbackMessage());

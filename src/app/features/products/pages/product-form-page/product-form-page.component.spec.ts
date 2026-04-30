@@ -102,6 +102,15 @@ describe('ProductFormPageComponent', () => {
     });
   });
 
+  it('should render the brand header on the create product page', () => {
+    createComponent();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    expect(compiled.textContent).toContain('BANCO');
+    expect(compiled.querySelector('app-brand-header')).not.toBeNull();
+  });
+
   it('should keep the submitting state while the create request is in progress', () => {
     productApiServiceMock.createProduct.mockReturnValue(NEVER);
 
@@ -151,6 +160,18 @@ describe('ProductFormPageComponent', () => {
     expect(productApiServiceMock.getProducts).toHaveBeenCalled();
     expect(component['product']()).toEqual(products[0]);
     expect(component['mode']()).toBe('edit');
+  });
+
+  it('should render the brand header on the edit product page', () => {
+    routeProductId = 'prd-001';
+    productApiServiceMock.getProducts.mockReturnValue(of({ data: products }));
+
+    createComponent();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    expect(compiled.textContent).toContain('BANCO');
+    expect(compiled.querySelector('app-brand-header')).not.toBeNull();
   });
 
   it('should show an error when the product to edit is not found', () => {

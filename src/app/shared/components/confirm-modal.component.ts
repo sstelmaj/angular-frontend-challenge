@@ -9,6 +9,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 export class ConfirmModalComponent {
   @Input() title = 'Confirmar acción';
   @Input() message = '';
+  @Input() emphasisText = '';
   @Input() confirmLabel = 'Confirmar';
   @Input() cancelLabel = 'Cancelar';
   @Input() isLoading = false;

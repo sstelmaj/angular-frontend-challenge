@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, injec
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
+import { AppBrandHeaderComponent } from '../../../../shared/components/app-brand-header.component';
 import { getHttpErrorMessage } from '../../../../shared/utils/http-error.utils';
 import { ProductFormComponent, ProductFormSubmitPayload } from '../../components/product-form.component';
 import { Product } from '../../models/product.model';
@@ -10,7 +11,7 @@ import { ProductApiService } from '../../services/product-api.service';
 
 @Component({
   selector: 'app-product-form-page',
-  imports: [RouterLink, ProductFormComponent],
+  imports: [AppBrandHeaderComponent, RouterLink, ProductFormComponent],
   templateUrl: './product-form-page.component.html',
   styleUrl: './product-form-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

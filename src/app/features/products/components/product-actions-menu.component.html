@@ -3,14 +3,15 @@
     type="button"
     class="actions-menu__trigger"
     [attr.aria-label]="'Abrir acciones de ' + productName"
-    [attr.aria-expanded]="isOpen()"
-    (click)="toggleMenu()"
+    aria-haspopup="menu"
+    [attr.aria-expanded]="isOpen"
+    (click)="requestToggle($event)"
   >
     ...
   </button>
 
-  @if (isOpen()) {
-    <div class="actions-menu__dropdown" role="menu">
+  @if (isOpen && dropdownStyle) {
+    <div class="actions-menu__dropdown" role="menu" [ngStyle]="dropdownStyle">
       <button type="button" class="actions-menu__item" role="menuitem" (click)="handleEdit()">
         Editar
       </button>

@@ -15,14 +15,17 @@
       @for (product of products; track trackById($index, product)) {
         <tr>
           <td>
-            <div class="logo-badge" aria-hidden="true">
-              <span>{{ getInitials(product.name) }}</span>
-              <img
-                [src]="product.logo"
-                [alt]="'Logo de ' + product.name"
-                loading="lazy"
-                (error)="hideBrokenImage($event)"
-              />
+            <div class="logo-badge">
+              @if (shouldShowLogoImage(product)) {
+                <img
+                  [src]="product.logo"
+                  [alt]="'Logo de ' + product.name"
+                  loading="lazy"
+                  (error)="handleLogoError(product.id)"
+                />
+              } @else {
+                <span aria-hidden="true">{{ getInitials(product.name) }}</span>
+              }
             </div>
           </td>
           <td class="product-name">{{ product.name }}</td>
@@ -32,6 +35,9 @@
           <td class="actions-cell">
             <app-product-actions-menu
               [productName]="product.name"
+              [isOpen]="isMenuOpen(product.id)"
+              [dropdownStyle]="isMenuOpen(product.id) ? openMenuStyle() : null"
+              (toggleRequested)="toggleMenu(product.id, $event)"
               (editSelected)="requestEdit(product.id)"
               (deleteSelected)="requestDelete(product)"
             ></app-product-actions-menu>

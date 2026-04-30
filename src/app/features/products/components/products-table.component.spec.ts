@@ -37,6 +37,10 @@ describe('ProductsTableComponent', () => {
     fixture.detectChanges();
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it('should render one row per product', () => {
     const rows = fixture.nativeElement.querySelectorAll('tbody tr');
     expect(rows.length).toBe(2);
@@ -56,7 +60,83 @@ describe('ProductsTableComponent', () => {
     expect(actionButtons.length).toBe(2);
   });
 
-  it('should emit editRequested when selecting Editar for a product', () => {
+  it('should render the product logo image when the logo value is available', () => {
+    const logoImage = fixture.nativeElement.querySelector('.logo-badge img') as HTMLImageElement;
+
+    expect(logoImage).not.toBeNull();
+    expect(logoImage.getAttribute('src')).toBe('https://example.com/card.png');
+  });
+
+  it('should keep an accessible alt text for the product logo image', () => {
+    const logoImage = fixture.nativeElement.querySelector('.logo-badge img') as HTMLImageElement;
+
+    expect(logoImage.getAttribute('alt')).toBe('Logo de Tarjetas de Credito');
+  });
+
+  it('should show the initials fallback when the image fails to load', () => {
+    const firstRow = fixture.nativeElement.querySelector('tbody tr') as HTMLTableRowElement;
+    const logoImage = firstRow.querySelector('.logo-badge img') as HTMLImageElement;
+
+    logoImage.dispatchEvent(new Event('error'));
+    fixture.detectChanges();
+
+    const fallback = firstRow.querySelector('.logo-badge span') as HTMLSpanElement;
+
+    expect(firstRow.querySelector('.logo-badge img')).toBeNull();
+    expect(fallback.textContent?.trim()).toBe('TD');
+  });
+
+  it('should keep only one dropdown open at a time', () => {
+    const actionButtons = fixture.nativeElement.querySelectorAll(
+      '.actions-menu__trigger'
+    ) as NodeListOf<HTMLButtonElement>;
+
+    actionButtons[0].click();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelectorAll('.actions-menu__dropdown')).toHaveLength(1);
+    expect(actionButtons[0].getAttribute('aria-expanded')).toBe('true');
+
+    actionButtons[1].click();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelectorAll('.actions-menu__dropdown')).toHaveLength(1);
+    expect(actionButtons[0].getAttribute('aria-expanded')).toBe('false');
+    expect(actionButtons[1].getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('should close the dropdown when clicking outside', () => {
+    const actionButtons = fixture.nativeElement.querySelectorAll(
+      '.actions-menu__trigger'
+    ) as NodeListOf<HTMLButtonElement>;
+
+    actionButtons[0].click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelectorAll('.actions-menu__dropdown')).toHaveLength(1);
+
+    document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelectorAll('.actions-menu__dropdown')).toHaveLength(0);
+    expect(actionButtons[0].getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('should close the dropdown when pressing Escape', () => {
+    const actionButtons = fixture.nativeElement.querySelectorAll(
+      '.actions-menu__trigger'
+    ) as NodeListOf<HTMLButtonElement>;
+
+    actionButtons[0].click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelectorAll('.actions-menu__dropdown')).toHaveLength(1);
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelectorAll('.actions-menu__dropdown')).toHaveLength(0);
+  });
+
+  it('should emit editRequested and close the dropdown when selecting Editar', () => {
     const emitSpy = jest.spyOn(component.editRequested, 'emit');
     const actionButtons = fixture.nativeElement.querySelectorAll(
       '.actions-menu__trigger'
@@ -70,9 +150,10 @@ describe('ProductsTableComponent', () => {
     fixture.detectChanges();
 
     expect(emitSpy).toHaveBeenCalledWith('trj-crd');
+    expect(fixture.nativeElement.querySelectorAll('.actions-menu__dropdown')).toHaveLength(0);
   });
 
-  it('should emit deleteRequested when selecting Eliminar for a product', () => {
+  it('should emit deleteRequested and close the dropdown when selecting Eliminar', () => {
     const emitSpy = jest.spyOn(component.deleteRequested, 'emit');
     const actionButtons = fixture.nativeElement.querySelectorAll(
       '.actions-menu__trigger'
@@ -88,5 +169,6 @@ describe('ProductsTableComponent', () => {
     fixture.detectChanges();
 
     expect(emitSpy).toHaveBeenCalledWith(products[0]);
+    expect(fixture.nativeElement.querySelectorAll('.actions-menu__dropdown')).toHaveLength(0);
   });
 });

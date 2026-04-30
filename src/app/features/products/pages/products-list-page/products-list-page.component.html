@@ -1,11 +1,10 @@
 <section class="page-shell">
+  <app-brand-header></app-brand-header>
+
   <header class="page-header">
-    <div>
-      <p class="eyebrow">Productos</p>
+    <div class="page-header__content">
       <h1>Productos financieros</h1>
-      <p class="supporting-text">
-        Consultá el catálogo disponible, filtrá localmente y ajustá la cantidad de registros visibles.
-      </p>
+      <p class="supporting-text">Administrá el catálogo de productos registrados.</p>
     </div>
 
     <a class="primary-link" routerLink="/products/new">Agregar</a>
@@ -70,6 +69,7 @@
     <app-confirm-modal
       title="Eliminar producto"
       [message]="deleteModalMessage()"
+      [emphasisText]="deleteModalEmphasisText()"
       confirmLabel="Eliminar"
       [isLoading]="isDeleting()"
       [errorMessage]="deleteErrorMessage()"
