@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SimpleChange } from '@angular/core';
 import { of } from 'rxjs';
 
+import { Product } from '../models/product.model';
 import { ProductApiService } from '../services/product-api.service';
 import { ProductFormComponent } from './product-form.component';
 
@@ -10,6 +11,15 @@ describe('ProductFormComponent', () => {
   let component: ProductFormComponent;
   let productApiServiceMock: {
     verifyProductId: jest.Mock;
+  };
+
+  const editingProduct: Product = {
+    id: 'prd-001',
+    name: 'Producto Demo',
+    description: 'Descripcion valida para el producto.',
+    logo: 'https://example.com/logo.png',
+    date_release: '2099-04-30',
+    date_revision: '2100-04-30'
   };
 
   beforeEach(async () => {
@@ -60,7 +70,7 @@ describe('ProductFormComponent', () => {
 
     expect(compiled.textContent).toContain('El ID debe tener al menos 3 caracteres.');
     expect(compiled.textContent).toContain('El nombre debe tener al menos 5 caracteres.');
-    expect(compiled.textContent).toContain('La descrip');
+    expect(compiled.textContent).toContain('La descripción debe tener al menos 10 caracteres.');
   });
 
   it('should recalculate date_revision when date_release changes', () => {
@@ -79,7 +89,7 @@ describe('ProductFormComponent', () => {
     expect(submittedSpy).not.toHaveBeenCalled();
   });
 
-  it('should emit a valid payload on submit', async () => {
+  it('should emit a create payload with id on submit in create mode', async () => {
     const submittedSpy = jest.fn();
     component.submitted.subscribe(submittedSpy);
 
@@ -102,7 +112,7 @@ describe('ProductFormComponent', () => {
     });
   });
 
-  it('should reset the form to its initial state when reiniciar is triggered', async () => {
+  it('should reset the form to its initial state when reiniciar is triggered in create mode', async () => {
     component.form.controls.id.setValue('prd-001');
     component.form.controls.name.setValue('Producto Demo');
     component.form.controls.description.setValue('Descripcion valida para el producto.');
@@ -142,12 +152,49 @@ describe('ProductFormComponent', () => {
     expect(dateRevisionInput.readOnly).toBe(true);
   });
 
-  it('should disable the id control in edit mode', () => {
+  it('should switch the primary button text according to the mode', () => {
+    expect(component.getPrimaryActionLabel()).toBe('Agregar');
+
     component.mode = 'edit';
     component.ngOnChanges({
       mode: new SimpleChange('create', 'edit', false)
     });
 
+    expect(component.getPrimaryActionLabel()).toBe('Guardar');
+  });
+
+  it('should disable id and remove async id validation in edit mode', () => {
+    component.mode = 'edit';
+    component.product = editingProduct;
+    component.ngOnChanges({
+      mode: new SimpleChange('create', 'edit', false),
+      product: new SimpleChange(null, editingProduct, false)
+    });
+
     expect(component.form.controls.id.disabled).toBe(true);
+    expect(component.form.controls.id.asyncValidator).toBeNull();
+    expect(productApiServiceMock.verifyProductId).not.toHaveBeenCalled();
+  });
+
+  it('should emit an update payload without id in edit mode', () => {
+    const submittedSpy = jest.fn();
+    component.submitted.subscribe(submittedSpy);
+    component.mode = 'edit';
+    component.product = editingProduct;
+    component.ngOnChanges({
+      mode: new SimpleChange('create', 'edit', false),
+      product: new SimpleChange(null, editingProduct, false)
+    });
+    fixture.detectChanges();
+
+    component.submitForm();
+
+    expect(submittedSpy).toHaveBeenCalledWith({
+      name: 'Producto Demo',
+      description: 'Descripcion valida para el producto.',
+      logo: 'https://example.com/logo.png',
+      date_release: '2099-04-30',
+      date_revision: '2100-04-30'
+    });
   });
 });

@@ -69,6 +69,10 @@ export class ProductsListPageComponent implements OnInit {
     this.pageSize.set(value);
   }
 
+  protected navigateToEdit(productId: string): void {
+    void this.router.navigate(['/products', productId, 'edit']);
+  }
+
   protected loadProducts(): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);

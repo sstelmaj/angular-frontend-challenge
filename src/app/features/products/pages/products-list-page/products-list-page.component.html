@@ -49,7 +49,10 @@
         }
       </div>
     } @else {
-      <app-products-table [products]="visibleProducts()"></app-products-table>
+      <app-products-table
+        [products]="visibleProducts()"
+        (editRequested)="navigateToEdit($event)"
+      ></app-products-table>
     }
 
     <footer class="list-footer">
