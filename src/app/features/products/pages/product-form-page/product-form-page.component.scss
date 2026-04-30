@@ -12,7 +12,7 @@
 }
 
 .form-card,
-.placeholder-card {
+.state-card {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
@@ -34,14 +34,43 @@ h1 {
   font-size: clamp(1.75rem, 2.2vw, 2.5rem);
 }
 
-.supporting-text,
-.route-meta {
+.supporting-text {
   margin: 0;
   color: var(--color-text-muted);
 }
 
-.route-meta {
-  margin-top: var(--space-4);
+.state-card--error {
+  border-color: rgba(199, 52, 52, 0.25);
+}
+
+.state-actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.primary-link,
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.primary-link {
+  background: #f4d768;
+  color: var(--color-primary-strong);
+}
+
+.secondary-button {
+  border: 0;
+  background: var(--color-surface-muted);
+  color: var(--color-primary-strong);
+  cursor: pointer;
 }
 
 @media (max-width: 720px) {
@@ -50,7 +79,11 @@ h1 {
   }
 
   .form-card,
-  .placeholder-card {
+  .state-card {
     padding: var(--space-5);
+  }
+
+  .state-actions {
+    flex-direction: column;
   }
 }

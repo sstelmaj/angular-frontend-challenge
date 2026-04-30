@@ -50,4 +50,25 @@ describe('ProductsTableComponent', () => {
     expect(compiled.textContent).toContain('01/01/2025');
     expect(compiled.textContent).toContain('01/02/2026');
   });
+
+  it('should render one actions menu per product', () => {
+    const actionButtons = fixture.nativeElement.querySelectorAll('.actions-menu__trigger');
+    expect(actionButtons.length).toBe(2);
+  });
+
+  it('should emit editRequested when selecting Editar for a product', () => {
+    const emitSpy = jest.spyOn(component.editRequested, 'emit');
+    const actionButtons = fixture.nativeElement.querySelectorAll(
+      '.actions-menu__trigger'
+    ) as NodeListOf<HTMLButtonElement>;
+
+    actionButtons[0].click();
+    fixture.detectChanges();
+
+    const editButton = fixture.nativeElement.querySelector('.actions-menu__item') as HTMLButtonElement;
+    editButton.click();
+    fixture.detectChanges();
+
+    expect(emitSpy).toHaveBeenCalledWith('trj-crd');
+  });
 });

@@ -16,6 +16,7 @@
         formControlName="id"
         maxlength="10"
         autocomplete="off"
+        [readonly]="mode === 'edit'"
       />
       @if (getControlErrorMessage('id'); as message) {
         <p class="field__error">{{ message }}</p>
@@ -111,7 +112,7 @@
       type="submit"
       [disabled]="submitting || form.invalid || form.pending"
     >
-      {{ submitting ? 'Agregando...' : 'Agregar' }}
+      {{ getPrimaryActionLabel() }}
     </button>
   </div>
 </form>

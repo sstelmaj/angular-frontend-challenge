@@ -1,4 +1,11 @@
 import {
+  AsyncValidatorFn,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators
+} from '@angular/forms';
+import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
@@ -10,21 +17,17 @@ import {
   inject
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {
-  FormBuilder,
-  ReactiveFormsModule,
-  ValidationErrors,
-  Validators
-} from '@angular/forms';
 
-import { CreateProductPayload } from '../models/product.payloads';
-import { ProductApiService } from '../services/product-api.service';
 import { dateReleaseValidator } from '../../../shared/validators/date-release.validator';
 import { dateRevisionValidator } from '../../../shared/validators/date-revision.validator';
 import { productIdAvailableValidator } from '../../../shared/validators/product-id-available.validator';
 import { addYearsToIsoDate } from '../../../shared/utils/date.utils';
+import { Product } from '../models/product.model';
+import { CreateProductPayload, UpdateProductPayload } from '../models/product.payloads';
+import { ProductApiService } from '../services/product-api.service';
 
 export type ProductFormMode = 'create' | 'edit';
+export type ProductFormSubmitPayload = CreateProductPayload | UpdateProductPayload;
 
 @Component({
   selector: 'app-product-form',
@@ -37,19 +40,23 @@ export class ProductFormComponent implements OnChanges {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(FormBuilder);
   private readonly productApiService = inject(ProductApiService);
+  private readonly idAvailabilityValidator: AsyncValidatorFn = productIdAvailableValidator(
+    this.productApiService
+  );
 
   @Input() mode: ProductFormMode = 'create';
+  @Input() product: Product | null = null;
   @Input() submitting = false;
   @Input() submitError: string | null = null;
 
-  @Output() readonly submitted = new EventEmitter<CreateProductPayload>();
+  @Output() readonly submitted = new EventEmitter<ProductFormSubmitPayload>();
   @Output() readonly resetRequested = new EventEmitter<void>();
 
   readonly form = this.formBuilder.group(
     {
       id: this.formBuilder.control('', {
         validators: [Validators.required, Validators.minLength(3), Validators.maxLength(10)],
-        asyncValidators: [productIdAvailableValidator(this.productApiService)]
+        asyncValidators: [this.idAvailabilityValidator]
       }),
       name: this.formBuilder.nonNullable.control('', [
         Validators.required,
@@ -77,10 +84,9 @@ export class ProductFormComponent implements OnChanges {
     this.form.controls.date_release.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((dateRelease) => {
-        this.form.controls.date_revision.setValue(
-          dateRelease ? addYearsToIsoDate(dateRelease) : '',
-          { emitEvent: false }
-        );
+        this.form.controls.date_revision.setValue(dateRelease ? addYearsToIsoDate(dateRelease) : '', {
+          emitEvent: false
+        });
         this.form.controls.date_revision.updateValueAndValidity({ emitEvent: false });
         this.form.updateValueAndValidity({ emitEvent: false });
       });
@@ -89,6 +95,10 @@ export class ProductFormComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['mode']) {
       this.syncMode();
+    }
+
+    if (changes['product'] && this.product) {
+      this.applyProductValue(this.product);
     }
   }
 
@@ -100,22 +110,43 @@ export class ProductFormComponent implements OnChanges {
       return;
     }
 
-    this.submitted.emit(this.form.getRawValue() as CreateProductPayload);
+    const formValue = this.form.getRawValue();
+
+    if (this.mode === 'edit') {
+      const { id: _id, ...payload } = formValue;
+      this.submitted.emit(payload as UpdateProductPayload);
+      return;
+    }
+
+    this.submitted.emit(formValue as CreateProductPayload);
   }
 
   resetForm(): void {
-    this.form.reset({
-      id: '',
-      name: '',
-      description: '',
-      logo: '',
-      date_release: '',
-      date_revision: ''
-    });
+    if (this.mode === 'edit' && this.product) {
+      this.applyProductValue(this.product);
+    } else {
+      this.form.reset({
+        id: '',
+        name: '',
+        description: '',
+        logo: '',
+        date_release: '',
+        date_revision: ''
+      });
+    }
+
     this.form.markAsPristine();
     this.form.markAsUntouched();
     this.syncMode();
     this.resetRequested.emit();
+  }
+
+  getPrimaryActionLabel(): string {
+    if (this.submitting) {
+      return this.mode === 'edit' ? 'Guardando...' : 'Agregando...';
+    }
+
+    return this.mode === 'edit' ? 'Guardar' : 'Agregar';
   }
 
   hasControlError(controlName: keyof typeof this.form.controls): boolean {
@@ -181,12 +212,34 @@ export class ProductFormComponent implements OnChanges {
   }
 
   private syncMode(): void {
+    const idControl = this.form.controls.id;
+
     if (this.mode === 'edit') {
-      this.form.controls.id.disable({ emitEvent: false });
+      idControl.clearAsyncValidators();
+      idControl.disable({ emitEvent: false });
+      idControl.updateValueAndValidity({ emitEvent: false });
       return;
     }
 
-    this.form.controls.id.enable({ emitEvent: false });
+    idControl.setAsyncValidators([this.idAvailabilityValidator]);
+    idControl.enable({ emitEvent: false });
+    idControl.updateValueAndValidity({ emitEvent: false });
+  }
+
+  private applyProductValue(product: Product): void {
+    this.form.reset(
+      {
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        logo: product.logo,
+        date_release: product.date_release,
+        date_revision: product.date_revision
+      },
+      { emitEvent: false }
+    );
+    this.form.updateValueAndValidity({ emitEvent: false });
+    this.syncMode();
   }
 
   private getIdErrorMessage(errors: ValidationErrors): string | null {

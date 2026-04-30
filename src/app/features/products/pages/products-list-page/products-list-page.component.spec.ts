@@ -131,6 +131,19 @@ describe('ProductsListPageComponent', () => {
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('5 de 7 resultados');
   });
 
+  it('should navigate to the edit route when edit is requested', () => {
+    const navigateSpy = jest.spyOn(router, 'navigate').mockResolvedValue(true);
+    productApiServiceSpy.getProducts.mockReturnValue(of({ data: products }));
+
+    fixture = TestBed.createComponent(ProductsListPageComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    component['navigateToEdit']('trj-crd');
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/products', 'trj-crd', 'edit']);
+  });
+
   it('should show the error state when loading products fails', () => {
     productApiServiceSpy.getProducts.mockReturnValue(
       throwError(

@@ -4,7 +4,7 @@
 
 .products-table {
   width: 100%;
-  min-width: 720px;
+  min-width: 820px;
   border-collapse: collapse;
 }
 
@@ -31,6 +31,12 @@
   font-weight: 700;
 }
 
+.actions-column,
+.actions-cell {
+  width: 5.5rem;
+  text-align: right;
+}
+
 .logo-badge {
   position: relative;
   display: grid;
@@ -51,4 +57,11 @@
   height: 100%;
   object-fit: cover;
   background: var(--color-surface);
+}
+
+@media (max-width: 720px) {
+  .products-table th,
+  .products-table td {
+    padding: var(--space-3);
+  }
 }

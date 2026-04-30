@@ -1,30 +1,42 @@
 <section class="page-shell">
   <a class="back-link" routerLink="/products">Volver a productos</a>
 
-  @if (mode() === 'create') {
+  @if (mode() === 'edit' && isLoadingProduct()) {
+    <div class="state-card" aria-live="polite">
+      <p class="eyebrow">Edición de producto</p>
+      <h1>Cargando producto</h1>
+      <p class="supporting-text">Obteniendo la información necesaria para editar el registro.</p>
+    </div>
+  } @else if (mode() === 'edit' && loadError(); as message) {
+    <div class="state-card state-card--error" aria-live="assertive">
+      <p class="eyebrow">Edición de producto</p>
+      <h1>No fue posible cargar el producto</h1>
+      <p class="supporting-text">{{ message }}</p>
+      <div class="state-actions">
+        <button type="button" class="secondary-button" (click)="retryLoadProduct()">Reintentar</button>
+        <a class="primary-link" routerLink="/products">Volver al listado</a>
+      </div>
+    </div>
+  } @else {
     <div class="form-card">
-      <p class="eyebrow">Alta de producto</p>
-      <h1>Formulario de Registro</h1>
+      <p class="eyebrow">{{ mode() === 'edit' ? 'Edición de producto' : 'Alta de producto' }}</p>
+      <h1>{{ mode() === 'edit' ? 'Formulario de Edición' : 'Formulario de Registro' }}</h1>
       <p class="supporting-text">
-        Completá los datos requeridos para registrar un nuevo producto financiero.
+        @if (mode() === 'edit') {
+          Actualizá la información del producto financiero seleccionado.
+        } @else {
+          Completá los datos requeridos para registrar un nuevo producto financiero.
+        }
       </p>
 
       <app-product-form
         [mode]="mode()"
+        [product]="product()"
         [submitting]="isSubmitting()"
         [submitError]="submitError()"
-        (submitted)="handleCreateProduct($event)"
+        (submitted)="handleSubmit($event)"
         (resetRequested)="clearSubmitError()"
       ></app-product-form>
-    </div>
-  } @else {
-    <div class="placeholder-card">
-      <p class="eyebrow">Próximamente</p>
-      <h1>Edición de producto</h1>
-      <p class="supporting-text">
-        La reutilización del formulario para edición queda preparada, pero esta fase solo cubre el alta.
-      </p>
-      <p class="route-meta">Producto seleccionado: <strong>{{ productId }}</strong></p>
     </div>
   }
 </section>

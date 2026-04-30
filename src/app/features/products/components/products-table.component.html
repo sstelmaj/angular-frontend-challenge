@@ -7,6 +7,7 @@
         <th scope="col">Descripción</th>
         <th scope="col">Fecha de liberación</th>
         <th scope="col">Fecha de revisión</th>
+        <th scope="col" class="actions-column">Acciones</th>
       </tr>
     </thead>
 
@@ -28,6 +29,12 @@
           <td>{{ product.description }}</td>
           <td>{{ formatDisplayDate(product.date_release) }}</td>
           <td>{{ formatDisplayDate(product.date_revision) }}</td>
+          <td class="actions-cell">
+            <app-product-actions-menu
+              [productName]="product.name"
+              (editSelected)="requestEdit(product.id)"
+            ></app-product-actions-menu>
+          </td>
         </tr>
       }
     </tbody>
