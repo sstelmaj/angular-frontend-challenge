@@ -14,7 +14,7 @@ Implementar una aplicación frontend que permita consultar y administrar product
 |---|---|
 | Framework | Angular 14 o superior |
 | Lenguaje | TypeScript 4.8 o superior |
-| Testing | Pruebas unitarias, de preferencia con Jest |
+| Testing | Pruebas unitarias, con Jest |
 | Backend a consumir | API local en `http://localhost:3002` |
 | Estilos | UI propia sin frameworks de estilos ni componentes prefabricados |
 
