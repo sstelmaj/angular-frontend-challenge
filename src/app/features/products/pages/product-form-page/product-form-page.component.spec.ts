@@ -1,6 +1,7 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, provideRouter, Router } from '@angular/router';
-import { of, throwError } from 'rxjs';
+import { ActivatedRoute, Router, provideRouter } from '@angular/router';
+import { NEVER, of, throwError } from 'rxjs';
 
 import { ProductApiService } from '../../services/product-api.service';
 import { ProductFormPageComponent } from './product-form-page.component';
@@ -17,7 +18,7 @@ describe('ProductFormPageComponent', () => {
   const validPayload = {
     id: 'prd-001',
     name: 'Producto Demo',
-    description: 'Descripción válida para el producto.',
+    description: 'Descripcion valida para el producto.',
     logo: 'https://example.com/logo.png',
     date_release: '2099-04-30',
     date_revision: '2100-04-30'
@@ -71,9 +72,32 @@ describe('ProductFormPageComponent', () => {
     });
   });
 
+  it('should keep the submitting state while the request is in progress', () => {
+    productApiServiceMock.createProduct.mockReturnValue(NEVER);
+
+    component['handleCreateProduct'](validPayload);
+
+    expect(component['isSubmitting']()).toBe(true);
+  });
+
+  it('should avoid a double submit while a request is already in progress', () => {
+    productApiServiceMock.createProduct.mockReturnValue(NEVER);
+
+    component['handleCreateProduct'](validPayload);
+    component['handleCreateProduct'](validPayload);
+
+    expect(productApiServiceMock.createProduct).toHaveBeenCalledTimes(1);
+  });
+
   it('should show a visual error state when creation fails', () => {
     productApiServiceMock.createProduct.mockReturnValue(
-      throwError(() => new Error('backend unavailable'))
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 400,
+            statusText: 'Bad Request'
+          })
+      )
     );
 
     component['handleCreateProduct'](validPayload);
@@ -81,6 +105,9 @@ describe('ProductFormPageComponent', () => {
 
     const compiled = fixture.nativeElement as HTMLElement;
 
-    expect(compiled.textContent).toContain('No fue posible crear el producto. Intentá nuevamente.');
+    expect(compiled.textContent).toContain(
+      'No fue posible crear el producto porque la informacion enviada es invalida.'
+    );
+    expect(component['isSubmitting']()).toBe(false);
   });
 });

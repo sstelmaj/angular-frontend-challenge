@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, injec
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 
+import { getHttpErrorMessage } from '../../../../shared/utils/http-error.utils';
 import { ProductsPageSizeSelectComponent } from '../../components/products-page-size-select.component';
 import { ProductsSearchBoxComponent } from '../../components/products-search-box.component';
 import { ProductsTableComponent } from '../../components/products-table.component';
@@ -80,11 +81,9 @@ export class ProductsListPageComponent implements OnInit {
           this.products.set(response.data);
           this.isLoading.set(false);
         },
-        error: () => {
+        error: (error: unknown) => {
           this.products.set([]);
-          this.errorMessage.set(
-            'No fue posible cargar los productos financieros. Intentá nuevamente.'
-          );
+          this.errorMessage.set(getHttpErrorMessage(error, 'loadProducts'));
           this.isLoading.set(false);
         }
       });
